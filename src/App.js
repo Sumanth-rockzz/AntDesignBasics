@@ -1,39 +1,34 @@
-import React, { useState } from "react";
+import React from "react";
 import "./App.css";
-import { Button } from "antd";
-import { PoweroffOutlined } from "@ant-design/icons";
+import { Input } from "antd";
+import {
+  UserOutlined,
+  SecurityScanFilled,
+  DollarCircleFilled,
+} from "@ant-design/icons";
 
 const App = () => {
-  const [loading, setLoading] = useState(false);
-  const onclickHandler = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  };
   return (
-    <div className="App">
-      <div className="AppHeader">
-        <Button
-          type="primary"
-          on
-          onClick={onclickHandler}
-          loading={loading}
-          icon={<PoweroffOutlined />}
-          className="my-button"
-          style={{ backgroundColor: "yellow" }}
-        >
-          Submit
-        </Button>
-        <Button type="link" href="#">
-          Submit
-        </Button>
-        <Button type="default">Submit</Button>
-        <Button type="dashed" block>
-          Submit
-        </Button>
-        <Button type="text">Submit</Button>
-      </div>
+    <div className="app">
+      <header className="app-header">
+        <Input.Search
+          placeholder="UserName"
+          maxLength={10}
+          minLength={4}
+          prefix={<UserOutlined />}
+          suffix={<DollarCircleFilled />}
+          allowClear
+          disabled={false}
+        ></Input.Search>
+        <Input
+          placeholder="Password"
+          maxLength={10}
+          minLength={4}
+          type="password"
+          prefix={<SecurityScanFilled />}
+          allowClear
+        ></Input>
+      </header>
     </div>
   );
 };
