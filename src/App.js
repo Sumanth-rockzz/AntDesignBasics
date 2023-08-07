@@ -1,33 +1,28 @@
 import React from "react";
 import "./App.css";
-import { Input } from "antd";
-import {
-  UserOutlined,
-  SecurityScanFilled,
-  DollarCircleFilled,
-} from "@ant-design/icons";
+import { Select } from "antd";
 
 const App = () => {
+  const fruits = ["Banana", "Mango", "Apple", "Orange"];
   return (
     <div className="app">
       <header className="app-header">
-        <Input.Search
-          placeholder="UserName"
-          maxLength={10}
-          minLength={4}
-          prefix={<UserOutlined />}
-          suffix={<DollarCircleFilled />}
+        <p>which is Your Favorite fruit</p>
+        <Select
+          mode="multiple"
+          placeholder="Select Fruit"
+          style={{ width: "100%", fontWeight: "bold", color: "blue" }}
           allowClear
-          disabled={false}
-        ></Input.Search>
-        <Input
-          placeholder="Password"
-          maxLength={10}
-          minLength={4}
-          type="password"
-          prefix={<SecurityScanFilled />}
-          allowClear
-        ></Input>
+          maxTagCount={2}
+        >
+          {fruits.map((fruit, index) => {
+            return (
+              <Select.Option value={fruit} key={index}>
+                {fruit}
+              </Select.Option>
+            );
+          })}
+        </Select>
       </header>
     </div>
   );
