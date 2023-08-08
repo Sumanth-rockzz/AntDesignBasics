@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import "./App.css";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { Button, Table, message, Modal, Input } from "antd";
 const App = () => {
   const [editVisible, setEditVisible] = useState(false);
@@ -47,6 +51,55 @@ const App = () => {
       key: "2",
       title: "Name",
       dataIndex: "name",
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => {
+        return (
+          <>
+            <Input
+              autoFocus
+              placeholder="Type your text here"
+              value={selectedKeys[0]}
+              onPressEnter={() => {
+                confirm();
+              }}
+              onBlur={() => {
+                confirm();
+              }}
+              onChange={(e) => {
+                setSelectedKeys(e.target.value ? [e.target.value] : []);
+                confirm({ closeDropdown: false });
+              }}
+            ></Input>
+            <Button
+              icon={<SearchOutlined />}
+              type="primary"
+              onClick={() => {
+                confirm();
+              }}
+            >
+              Search
+            </Button>
+            <Button
+              type="danger"
+              onClick={() => {
+                clearFilters();
+              }}
+            >
+              Clear
+            </Button>
+          </>
+        );
+      },
+      filterIcon: () => {
+        return <SearchOutlined />;
+      },
+      onFilter: (value, record) => {
+        return record.name.toLowerCase().includes(value.toLowerCase());
+      },
     },
     {
       key: "3",
