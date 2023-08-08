@@ -1,143 +1,175 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
-import { Table, Tag } from "antd";
-import { getToDoList } from "./API/API";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Button, Table, message, Modal, Input } from "antd";
 const App = () => {
-  const [todoList, setTodoList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [alreadySelectedRows, setAlreadySelectedRows] = useState([
-    "1",
-    "2",
-    "3",
+  const [editVisible, setEditVisible] = useState(false);
+  const [editStudent, setEditStudent] = useState(null);
+
+  const [dataSource, setDataSource] = useState([
+    {
+      key: 1,
+      id: 1,
+      name: "Sumanth",
+      email: "Sumanthn876@gmail.com",
+      city: "Bangalore",
+    },
+    {
+      key: 2,
+      id: 2,
+      name: "Likith",
+      email: "Likith@gmail.com",
+      city: "Bangalore",
+    },
+    {
+      key: 3,
+      id: 3,
+      name: "Gagan",
+      email: "Gagan@gmail.com",
+      city: "Bangalore",
+    },
+    {
+      key: 4,
+      id: 4,
+      name: "Charan",
+      email: "charan@gmail.com",
+      city: "Bangalore",
+    },
   ]);
-  useEffect(() => {
-    setLoading(true);
-    getToDoList().then((data) => {
-      data = data.map((todo) => {
-        todo.key = todo.id;
-        return todo;
-      });
-      setTodoList(data);
-      setLoading(false);
-      setTotalCount(data.length);
-    });
-  }, []);
 
   const columns = [
     {
-      title: "Id",
-      dataIndex: "id",
       key: "1",
-      sorter: (a, b) => {
-        return a.id > b.id;
-      },
+      title: "ID",
+      dataIndex: "id",
     },
     {
-      title: "User Id",
-      dataIndex: "userId",
       key: "2",
-      sorter: (a, b) => {
-        return a.userId > b.userId;
-      },
+      title: "Name",
+      dataIndex: "name",
     },
     {
-      title: "Title",
-      dataIndex: "title",
       key: "3",
+      title: "Email",
+      dataIndex: "email",
     },
     {
-      title: "Status",
-      dataIndex: "completed",
       key: "4",
-      render: (completed) => {
-        const color = completed ? "blue" : "red";
+      title: "City",
+      dataIndex: "city",
+    },
+    {
+      key: "5",
+      title: "Actions",
+      render: (data) => {
         return (
-          <Tag color={color}>{completed ? "Completed" : "In Progress"}</Tag>
+          <div>
+            <EditOutlined
+              onClick={() => editStudentHandler(data)}
+              style={{ color: "blue", marginRight: 15 }}
+            />
+            <DeleteOutlined
+              onClick={() => deleteStudentHandler(data)}
+              style={{ color: "red", marginLeft: 15 }}
+            />
+          </div>
         );
-      },
-      filters: [
-        { text: "Complete", value: true },
-        { text: "In Progress", value: false },
-      ],
-      onFilter: (value, record) => {
-        return record.completed === value;
       },
     },
   ];
 
+  const addStudentHandler = () => {
+    let randomNumber = Math.random() * 1000;
+    const newStudent = {
+      key: randomNumber.toFixed(0),
+      id: randomNumber.toFixed(0),
+      name: "Charan",
+      email: "charan@gmail.com",
+      city: "Bangalore",
+    };
+    setDataSource((prev) => {
+      return [...prev, newStudent];
+    });
+    message.success(
+      `${newStudent.name}'s record has been created successfully`
+    );
+  };
+
+  const deleteStudentHandler = (data) => {
+    Modal.confirm({
+      title: "Are You sure ,You Wanna Delete this student record ",
+      okText: "Yes",
+      okType: "danger",
+      onOk: () => {
+        setDataSource((prev) => {
+          return prev.filter((student) => student.id !== data.id);
+        });
+        message.success(`${data.name}'s record has been deleted successfully`);
+      },
+    });
+  };
+
+  const editStudentHandler = (record) => {
+    setEditVisible(true);
+    setEditStudent({ ...record });
+  };
+
+  const resetEditingHandler = () => {
+    setEditVisible(false);
+    setEditStudent(null);
+  };
+
   return (
     <div className="app">
       <header className="app-header">
-        <Table
-          columns={columns}
-          dataSource={todoList}
-          rowSelection={{
-            type: "checkbox",
-            onSelect: (data) => {
-              console.log(data);
-            },
-            selectedRowKeys: alreadySelectedRows,
-            onChange: (keys) => {
-              setAlreadySelectedRows(keys);
-            },
-            getCheckboxProps: (data) => ({
-              disabled: data.completed === true,
-            }),
-            hideSelectAll: false, //can be set true
-            selections: [
-              Table.SELECTION_ALL,
-              Table.SELECTION_INVERT,
-              Table.SELECTION_NONE,
-              {
-                key: "even",
-                text: "Select Even Rows",
-                onSelect: (allKeys) => {
-                  const selectedKeys = allKeys.filter((key) => key % 2 === 0);
-                  setAlreadySelectedRows(selectedKeys);
-                },
-              },
-              {
-                key: "completed",
-                text: "Select all with Status Completed",
-                onSelect: (allKeys) => {
-                  const selectedKeys = allKeys.filter((key) => {
-                    return todoList.find((list) => {
-                      return list.key === key && list.status === "completed";
-                    });
-                  });
-                  setAlreadySelectedRows(selectedKeys);
-                },
-              },
-              {
-                key: "progress",
-                text: "Select all with Status In Progress",
-                onSelect: (allKeys) => {
-                  const selectedKeys = allKeys.filter((key) => {
-                    return todoList.find((list) => {
-                      return list.key === key && list.status !== "completed";
-                    });
-                  });
-                  setAlreadySelectedRows(selectedKeys);
-                },
-              },
-            ],
+        <Button onClick={addStudentHandler}>Create New Student</Button>
+        <Table columns={columns} dataSource={dataSource}></Table>
+        <Modal
+          title="Edit Student Info"
+          open={editVisible}
+          onCancel={() => resetEditingHandler()}
+          onOk={() => {
+            setDataSource((prev) => {
+              return prev.map((student) => {
+                if (student.id === editStudent.id) {
+                  return editStudent;
+                } else {
+                  return student;
+                }
+              });
+            });
+            resetEditingHandler();
+            message.success(
+              `${editStudent.name}'s record has been updated successfully`
+            );
           }}
-          pagination={{
-            current: page,
-            pageSize: limit,
-            total: totalCount, //total count of data here
-            onChange: (page, limit) => {
-              setPage(page);
-              setLimit(limit);
-              //make an api call here preferred page and limit so that we change dataSource accordingly
-            },
-          }}
-          loading={loading}
-          scroll={5}
-        ></Table>
+          okText="Save"
+        >
+          <Input
+            value={editStudent?.name}
+            onChange={(e) => {
+              setEditStudent((prev) => {
+                return { ...prev, name: e.target.value };
+              });
+            }}
+          ></Input>
+          <Input
+            value={editStudent?.email}
+            onChange={(e) => {
+              setEditStudent((prev) => {
+                return { ...prev, email: e.target.value };
+              });
+            }}
+          ></Input>
+          <Input
+            value={editStudent?.city}
+            onChange={(e) => {
+              setEditStudent((prev) => {
+                return { ...prev, city: e.target.value };
+              });
+            }}
+          ></Input>
+        </Modal>
       </header>
     </div>
   );
