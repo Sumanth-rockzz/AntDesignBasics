@@ -1,228 +1,175 @@
-import React, { useState } from "react";
+import React from "react";
 import "./App.css";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-import { Button, Table, message, Modal, Input } from "antd";
+import { Button, Checkbox, DatePicker, Form, Input, Select } from "antd";
+
 const App = () => {
-  const [editVisible, setEditVisible] = useState(false);
-  const [editStudent, setEditStudent] = useState(null);
-
-  const [dataSource, setDataSource] = useState([
-    {
-      key: 1,
-      id: 1,
-      name: "Sumanth",
-      email: "Sumanthn876@gmail.com",
-      city: "Bangalore",
-    },
-    {
-      key: 2,
-      id: 2,
-      name: "Likith",
-      email: "Likith@gmail.com",
-      city: "Bangalore",
-    },
-    {
-      key: 3,
-      id: 3,
-      name: "Gagan",
-      email: "Gagan@gmail.com",
-      city: "Bangalore",
-    },
-    {
-      key: 4,
-      id: 4,
-      name: "Charan",
-      email: "charan@gmail.com",
-      city: "Bangalore",
-    },
-  ]);
-
-  const columns = [
-    {
-      key: "1",
-      title: "ID",
-      dataIndex: "id",
-    },
-    {
-      key: "2",
-      title: "Name",
-      dataIndex: "name",
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }) => {
-        return (
-          <>
-            <Input
-              autoFocus
-              placeholder="Type your text here"
-              value={selectedKeys[0]}
-              onPressEnter={() => {
-                confirm();
-              }}
-              onBlur={() => {
-                confirm();
-              }}
-              onChange={(e) => {
-                setSelectedKeys(e.target.value ? [e.target.value] : []);
-                confirm({ closeDropdown: false });
-              }}
-            ></Input>
-            <Button
-              icon={<SearchOutlined />}
-              type="primary"
-              onClick={() => {
-                confirm();
-              }}
-            >
-              Search
-            </Button>
-            <Button
-              type="danger"
-              onClick={() => {
-                clearFilters();
-              }}
-            >
-              Clear
-            </Button>
-          </>
-        );
-      },
-      filterIcon: () => {
-        return <SearchOutlined />;
-      },
-      onFilter: (value, record) => {
-        return record.name.toLowerCase().includes(value.toLowerCase());
-      },
-    },
-    {
-      key: "3",
-      title: "Email",
-      dataIndex: "email",
-    },
-    {
-      key: "4",
-      title: "City",
-      dataIndex: "city",
-    },
-    {
-      key: "5",
-      title: "Actions",
-      render: (data) => {
-        return (
-          <div>
-            <EditOutlined
-              onClick={() => editStudentHandler(data)}
-              style={{ color: "blue", marginRight: 15 }}
-            />
-            <DeleteOutlined
-              onClick={() => deleteStudentHandler(data)}
-              style={{ color: "red", marginLeft: 15 }}
-            />
-          </div>
-        );
-      },
-    },
-  ];
-
-  const addStudentHandler = () => {
-    let randomNumber = Math.random() * 1000;
-    const newStudent = {
-      key: randomNumber.toFixed(0),
-      id: randomNumber.toFixed(0),
-      name: "Charan",
-      email: "charan@gmail.com",
-      city: "Bangalore",
-    };
-    setDataSource((prev) => {
-      return [...prev, newStudent];
-    });
-    message.success(
-      `${newStudent.name}'s record has been created successfully`
-    );
-  };
-
-  const deleteStudentHandler = (data) => {
-    Modal.confirm({
-      title: "Are You sure ,You Wanna Delete this student record ",
-      okText: "Yes",
-      okType: "danger",
-      onOk: () => {
-        setDataSource((prev) => {
-          return prev.filter((student) => student.id !== data.id);
-        });
-        message.success(`${data.name}'s record has been deleted successfully`);
-      },
-    });
-  };
-
-  const editStudentHandler = (record) => {
-    setEditVisible(true);
-    setEditStudent({ ...record });
-  };
-
-  const resetEditingHandler = () => {
-    setEditVisible(false);
-    setEditStudent(null);
-  };
-
   return (
     <div className="app">
       <header className="app-header">
-        <Button onClick={addStudentHandler}>Create New Student</Button>
-        <Table columns={columns} dataSource={dataSource}></Table>
-        <Modal
-          title="Edit Student Info"
-          open={editVisible}
-          onCancel={() => resetEditingHandler()}
-          onOk={() => {
-            setDataSource((prev) => {
-              return prev.map((student) => {
-                if (student.id === editStudent.id) {
-                  return editStudent;
-                } else {
-                  return student;
-                }
-              });
-            });
-            resetEditingHandler();
-            message.success(
-              `${editStudent.name}'s record has been updated successfully`
-            );
+        <Form
+          labelCol={{ span: 10 }}
+          labelAlign={{ span: 10 }}
+          onFinish={(values) => {
+            console.log(values);
           }}
-          okText="Save"
+          style={{ fontWeight: "bold" }}
+          autoComplete="off"
+          onFinishFailed={(error) => {
+            console.log(error);
+          }}
         >
-          <Input
-            value={editStudent?.name}
-            onChange={(e) => {
-              setEditStudent((prev) => {
-                return { ...prev, name: e.target.value };
-              });
-            }}
-          ></Input>
-          <Input
-            value={editStudent?.email}
-            onChange={(e) => {
-              setEditStudent((prev) => {
-                return { ...prev, email: e.target.value };
-              });
-            }}
-          ></Input>
-          <Input
-            value={editStudent?.city}
-            onChange={(e) => {
-              setEditStudent((prev) => {
-                return { ...prev, city: e.target.value };
-              });
-            }}
-          ></Input>
-        </Modal>
+          <Form.Item
+            name="fullName"
+            label="Full Name"
+            rules={[
+              {
+                required: true,
+                message: "Please enter your name",
+              },
+              {
+                whitespace: true,
+              },
+              {
+                min: 3,
+                message: "It should have atleast 3 characters ",
+              },
+              {
+                max: 20,
+                message: "It can have max 20 characters ",
+              },
+            ]}
+            hasFeedback
+          >
+            <Input placeholder="Enter your name here" allowClear />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="Email ID"
+            rules={[
+              {
+                required: true,
+                message: "Email Id is required",
+              },
+              {
+                type: "email",
+                message: "Please enter a email id",
+              },
+            ]}
+            hasFeedback
+          >
+            <Input
+              placeholder="Enter your email here"
+              type="email"
+              allowClear
+            />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[
+              {
+                required: true,
+                message: "Password field is required",
+              },
+              {
+                min: 8,
+                message: "Password should contain atleast 8 characters",
+              },
+              {
+                validator: (_, value) => {
+                  return value && value.includes("a")
+                    ? Promise.resolve()
+                    : Promise.reject("Password does not match criteria");
+                },
+              },
+            ]}
+            hasFeedback
+          >
+            <Input.Password
+              placeholder="Create your new password here"
+              allowClear
+            />
+          </Form.Item>
+          <Form.Item
+            name="confirmPassword"
+            label="Confirm Password"
+            dependencies={["password"]}
+            rules={[
+              {
+                required: true,
+                message: "Confirm password field is required",
+              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("password") === value)
+                    return Promise.resolve();
+                  return Promise.reject("The Passwords does not match");
+                },
+              }),
+            ]}
+            hasFeedback
+          >
+            <Input.Password
+              placeholder="Confirm your above entered password here"
+              allowClear
+            />
+          </Form.Item>
+          <Form.Item
+            name="gender"
+            requiredMark="optional"
+            label="Gender"
+            hasFeedback
+          >
+            <Select placeholder="Select your gender">
+              <Select.Option value="male">Male</Select.Option>
+              <Select.Option value="female">Female</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="dob"
+            label="Date of Birth"
+            rules={[
+              {
+                required: true,
+                message: "Please select your Date of Birth",
+              },
+            ]}
+            hasFeedback
+          >
+            <DatePicker style={{ width: "100%" }} picker="date"></DatePicker>
+          </Form.Item>
+          <Form.Item
+            name="portfolio"
+            label="Portfolio url"
+            rules={[{ type: "url", message: "Please enter valid url" }]}
+          >
+            <Input placeholder="Add your url here" allowClear />
+          </Form.Item>
+          <Form.Item
+            name="agreement"
+            wrapperCol={{ span: 24 }}
+            style={{ marginLeft: "70px" }}
+            valuePropName="checked"
+            rules={[
+              {
+                validator(_, value) {
+                  return value
+                    ? Promise.resolve()
+                    : Promise.reject("Please accept the terms & conditions");
+                },
+              },
+            ]}
+          >
+            <Checkbox>
+              Agree to our <a href="/">Terms & Conditions</a>
+            </Checkbox>
+          </Form.Item>
+          <Form.Item wrapperCol={{ span: 24 }}>
+            <Button block type="primary" htmlType="submit">
+              Register
+            </Button>
+          </Form.Item>
+        </Form>
       </header>
     </div>
   );
